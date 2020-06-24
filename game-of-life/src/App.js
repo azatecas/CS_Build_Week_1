@@ -33,7 +33,8 @@ function App() {
   });
 
   const [running, setRunning] = useState(false);
-  let [counter, setCounter] = useState(0)
+  let [counter, setCounter] = useState(0);
+  let [cells, setCells] = useState(0);
 
   const runningRef = useRef(running);
   runningRef.current = running
@@ -45,7 +46,7 @@ function App() {
   const makeRandomGrid = () => {
     const rows = [];
     for (let i = 0; i < numRows; i++){
-        rows.push(Array.from(Array(numCols), () => Math.random() > .7 ? 1 : 0))
+        rows.push(Array.from(Array(numCols), () => { if(Math.random() > .98){setCells(cells += 1); return 1}else{return 0}}))
     }
     setGrid(rows);
   }
@@ -68,12 +69,16 @@ function App() {
               if (newI >= 0 && newI < numRows && newK >= 0 && newK < numCols){
                 
                 neighbors += g[newI][newK]
+                
               }
             })
             if (neighbors < 2 || neighbors > 3) {
+              // setCells(cells -= 1);
               gridCopy[i][k] = 0;
+              
             } else if (g[i][k] === 0 && neighbors === 3) {
               gridCopy[i][k] = 1;
+              // setCells(cells += 1);
             }
             
           }
@@ -101,16 +106,29 @@ function App() {
 
         { running ? 'STOP' : 'START' }
       </button>
-      <button onClick={() => {setGrid(makeEmptyGrid()); setRunning(false)}}>
+      <button onClick={() => {
+        setGrid(makeEmptyGrid());
+        setRunning(false);
+        setCounter(0);
+        setCells(0);
+        setCounter(0);
+      }}>
         CLEAR
       </button>
 
-      <button onClick={() => {if (!running){makeRandomGrid()}else{ alert("Simulation must be stopped first")}}}>
+      <button onClick={() => {
+        if (!running){
+          makeRandomGrid()
+        } else { 
+          alert("Simulation must be stopped first")
+        }
+      }}>
         Random Pattern
       </button>
       <h1>
         Count: {counter}
       </h1>
+      <h1>Total Cells: {cells}</h1>
 
       <div style={{display: 'grid', gridTemplateColumns:`repeat(${numCols}, 20px )`}}>
       {grid.map((rows, i) => (
