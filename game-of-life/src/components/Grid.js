@@ -1,38 +1,66 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
-import { connect } from 'react-redux';
 import produce from 'immer';
 
 
 
-
-
-const Grid = ({operations, numRows, numCols, grid1}) => {
-
-    const makeEmptyGrid = () => {
-        const rows = [];
-        for (let i = 0; i < numRows; i++){
-            rows.push(Array.from(Array(numCols), () => 0))
-        }
-        return rows;  
-    }    
-    
-    const [grid, setGrid] = useState(()=> {    
-      return makeEmptyGrid();
-    });
-
+const Grid = () => {
+    const [numRows, setNumRows] = useState(30);
+    const [numCols, setNumCols] = useState(30);
+    const [grid, setGrid] = useState([]);
     const [running, setRunning] = useState(false);
+    const [operations, setOperations] = useState([
+        [0, 1],
+        [0, -1],
+        [1, -1],
+        [-1, 1],
+        [1, 1],
+        [-1, -1],
+        [1, 0],
+        [-1, 0]
+      ],)
     let [counter, setCounter] = useState(0);
-    let [cells, setCells] = useState(0);
+    let [randomSlider, setRandomSlider] = useState(.5);
+    let [timeSlider, setTimeSlider] = useState(700)
 
     const runningRef = useRef(running);
-    runningRef.current = running
+    runningRef.current = running;
+
+    const timeRef = useRef(timeSlider);
+    timeRef.current = timeSlider;
+
+    const counterRef = useRef(counter);
+    counterRef.current = counter;
+
+    const numRowsRef = useRef(numRows);
+    numRowsRef.current = numRows
+
+    const numColsRef = useRef(numCols);
+    numColsRef.current = numCols;
+    
+    const gridRef = useRef(grid);
+    gridRef.current = grid;
+
+    useEffect(() => {
+        setGrid(Array(numRowsRef.current).fill(Array(numColsRef.current).fill(0)))
+    }, [numRowsRef.current, numColsRef.current]);
+    
 
     const makeRandomGrid = () => {
         const rows = [];
-        for (let i = 0; i < numRows; i++){
-            rows.push(Array.from(Array(numCols), () => { if(Math.random() > .75){setCells(cells += 1); return 1}else{return 0}}))
+        for (let i = 0; i < numRowsRef.current; i++){
+            rows.push(Array.from(Array(numColsRef.current), () => Math.random() > randomSlider ? 1 : 0))
         }
         setGrid(rows);
+    }
+
+
+    const handleRandomChange = (event) => {
+        setRandomSlider(event.target.value);
+    }
+
+    const handleTimeChange = (event) => {
+        setTimeSlider(Number(event.target.value));
+            console.log("TTTTTTTTttt", timeSlider)
     }
 
     const runSimulation = useCallback(() => {
@@ -42,14 +70,14 @@ const Grid = ({operations, numRows, numCols, grid1}) => {
     
         setGrid((g) => {
           return produce(g, gridCopy => {
-            for (let i = 0; i < numRows; i++) {
-              for (let k = 0; k < numCols; k++) {                  
+            for (let i = 0; i < numRowsRef.current; i++) {
+              for (let k = 0; k < numColsRef.current; k++) {                  
                 let neighbors = 0;
                 operations.forEach(([x, y]) => {
                   const newI = i + x;
                   const newK = k + y;
 
-                  if (newI >= 0 && newI < numRows && newK >= 0 && newK < numCols){
+                  if (newI >= 0 && newI < numRowsRef.current && newK >= 0 && newK < numColsRef.current){
                     neighbors += g[newI][newK]
                   }
                 })
@@ -65,24 +93,24 @@ const Grid = ({operations, numRows, numCols, grid1}) => {
           })
         })
     
-        setTimeout(() => {
-          setCounter(counter += 1);
+        setTimeout(() => {          
           runSimulation()
-        }, 200);
+          setCounter(counterRef.current += 1);
+        }, timeRef.current);
     
     }, [])
 
     return(
         <>
             <div className='main-cont'>
-                <div className="grid-cont">
-                    {grid.map((rows, i) => (
+                <div className="grid-cont" style={{gridTemplateColumns:`repeat(${numRows}, 20px)`}}>
+                    {gridRef.current.map((rows, i) => (
                         rows.map((col, k) => (
                             <div 
                                 key={`${i}-${k}`}
                                 onClick={() => {
                                     if (!running){
-                                        const newGrid = produce(grid, gridCopy => {
+                                        const newGrid = produce(gridRef.current, gridCopy => {
                                             gridCopy[i][k] = grid[i][k] ? 0 : 1;
                                         })
                                         setGrid(newGrid);
@@ -94,12 +122,12 @@ const Grid = ({operations, numRows, numCols, grid1}) => {
                     ))} 
                 </div>
 
-                <div>
+                <div className="control">
                     <button onClick={() => {
-                        setRunning(!running); 
+                        setRunning(!running);
                         if (!running) {
-                        runningRef.current = true; 
-                        runSimulation()
+                            runningRef.current = true; 
+                            runSimulation()
                         }
                         
                         }}>
@@ -108,11 +136,11 @@ const Grid = ({operations, numRows, numCols, grid1}) => {
                     </button>
 
                     <button onClick={() => {
-                        setGrid(makeEmptyGrid());
+                        setGrid(Array(numRowsRef.current).fill(Array(numColsRef.current).fill(0)));
                         setRunning(false);
                         setCounter(0);
-                        setCells(0);
-                        setCounter(0);
+                        counterRef.current = counter;
+
                     }}>
                         CLEAR
                     </button>
@@ -126,27 +154,35 @@ const Grid = ({operations, numRows, numCols, grid1}) => {
                     }}>
                         Random Pattern
                     </button>
-                    <h1>Count: {counter}</h1>
-                    <h1>Total Cells: {cells}</h1>
+
+                    <h1>Lifecycles: {counterRef.current}</h1>
+
+
+                    <input 
+                        id="random-slider" 
+                        type="range" 
+                        min=".10" max=".99" 
+                        value={randomSlider} 
+                        onChange={handleRandomChange}
+                        step=".01"
+                    />
+                    <p>Random Size: {Math.floor(randomSlider * 10)}</p>
+
+
+                    <input 
+                        id="time-slider" 
+                        type="range" 
+                        min="100" max="2500" 
+                        value={timeSlider.time} 
+                        onChange={handleTimeChange}
+                        step="100"
+                    />
+                    <p>Speed of Life: {26 - (timeSlider / 100)}</p>
                 </div>
             </div>
         </>
     )
 }
 
-const mapStateToProps = state => {
-    return {
-        operations: state.operations,
-        grid1: state.grid1,
-        numRows: state.numRows,
-        numCols: state.numCols,
-        // running: state.running,
-        // counter: state.counter,
-        // cells: state.cells,
-        error: state.error,
-    }
-}
 
-export default connect(
-    mapStateToProps,
-    )(Grid);
+export default Grid;
