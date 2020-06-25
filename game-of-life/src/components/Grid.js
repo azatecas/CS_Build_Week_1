@@ -4,8 +4,8 @@ import produce from 'immer';
 
 
 const Grid = () => {
-    const [numRows, setNumRows] = useState(30);
-    const [numCols, setNumCols] = useState(30);
+    const [numRows, setNumRows] = useState(50);
+    const [numCols, setNumCols] = useState(50);
     const [grid, setGrid] = useState([]);
     const [running, setRunning] = useState(false);
     const [operations, setOperations] = useState([
@@ -20,7 +20,7 @@ const Grid = () => {
       ],)
     let [counter, setCounter] = useState(0);
     let [randomSlider, setRandomSlider] = useState(.5);
-    let [timeSlider, setTimeSlider] = useState(700)
+    let [timeSlider, setTimeSlider] = useState(200)
 
     const runningRef = useRef(running);
     runningRef.current = running;
@@ -103,7 +103,7 @@ const Grid = () => {
     return(
         <>
             <div className='main-cont'>
-                <div className="grid-cont" style={{gridTemplateColumns:`repeat(${numRows}, 20px)`}}>
+                <div className="grid-cont" style={{gridTemplateColumns:`repeat(${numRows}, .8vw)`}}>
                     {gridRef.current.map((rows, i) => (
                         rows.map((col, k) => (
                             <div 
@@ -123,61 +123,73 @@ const Grid = () => {
                 </div>
 
                 <div className="control">
-                    <button onClick={() => {
-                        setRunning(!running);
-                        if (!running) {
-                            runningRef.current = true; 
-                            runSimulation()
-                        }
-                        
-                        }}>
+                    <div className="btn-cont">
+                        <button onClick={() => {
+                            setRunning(!running);
+                            if (!running) {
+                                runningRef.current = true; 
+                                runSimulation()
+                            }
+                            
+                            }}
+                            className={running ? 'stop-btn' : 'start-btn'} 
+                            >
 
-                        { running ? 'STOP' : 'START' }
-                    </button>
+                            { running ? 'STOP ⏸' : 'START ▶' }
+                        </button>
 
-                    <button onClick={() => {
-                        setGrid(Array(numRowsRef.current).fill(Array(numColsRef.current).fill(0)));
-                        setRunning(false);
-                        setCounter(0);
-                        counterRef.current = counter;
+                        <button onClick={() => {
+                            setGrid(Array(numRowsRef.current).fill(Array(numColsRef.current).fill(0)));
+                            setRunning(false);
 
-                    }}>
-                        CLEAR
-                    </button>
+                            setTimeout(() => {          
+                            setCounter(0);
+                            }, 100);
+                            }}
+                            className="clear-btn"
+                        >
+                            {`CLEAR ❌` }
+                        </button>
 
-                    <button onClick={() => {
-                        if (!running){
-                        makeRandomGrid()
-                        } else { 
-                        alert("Simulation must be stopped first")
-                        }
-                    }}>
-                        Random Pattern
-                    </button>
+                        <button onClick={() => {
+                            if (!running){
+                            makeRandomGrid()
+                            } else { 
+                            alert("Simulation must be stopped first")
+                            }
+                            }}>
+                            {`RANDOM 🔃`}
+                        </button>
+                    </div>
+                    
+                    <div className="slider-cont">
+                        <div className="labels">
+                            <p>Lifecycles</p>
+                            <p>Speed</p>
+                            <p>Random</p>
+                        </div>
 
-                    <h1>Lifecycles: {counterRef.current}</h1>
-
-
-                    <input 
-                        id="random-slider" 
-                        type="range" 
-                        min=".10" max=".99" 
-                        value={randomSlider} 
-                        onChange={handleRandomChange}
-                        step=".01"
-                    />
-                    <p>Random Size: {Math.floor(randomSlider * 10)}</p>
-
-
-                    <input 
-                        id="time-slider" 
-                        type="range" 
-                        min="100" max="2500" 
-                        value={timeSlider.time} 
-                        onChange={handleTimeChange}
-                        step="100"
-                    />
-                    <p>Speed of Life: {26 - (timeSlider / 100)}</p>
+                        <div className="values">
+                            <p>{counterRef.current}</p>
+                            <input 
+                                id="time-slider" 
+                                type="range" 
+                                min="100" max="1000" 
+                                value={timeSlider.time} 
+                                onChange={handleTimeChange}
+                                step="100"
+                            />
+                            
+                            <input 
+                                id="random-slider" 
+                                type="range" 
+                                min=".10" max=".99" 
+                                value={randomSlider} 
+                                onChange={handleRandomChange}
+                                step=".01"
+                            />            
+                        </div>                  
+                    </div>
                 </div>
             </div>
         </>
