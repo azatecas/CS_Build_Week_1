@@ -121,6 +121,15 @@ const Grid = () => {
                         ))
                     ))} 
                 </div>
+               
+
+            <div>
+
+                <div className="title">
+                    <h3>John Conway's</h3>
+                    <h1>Game of Life</h1>
+                </div>
+
 
                 <div className="control">
                     <div className="btn-cont">
@@ -136,6 +145,21 @@ const Grid = () => {
                             >
 
                             { running ? 'STOP ⏸' : 'START ▶' }
+                        </button>
+
+                        <button onClick={() => {
+                            if (!running) {
+                                runningRef.current = true; 
+                                runSimulation()
+                                setRunning(false)
+                            }
+                            }
+                            
+                            }
+                            className='next-btn'
+                            >
+
+                            {'NEXT ⏭' }
                         </button>
 
                         <button onClick={() => {
@@ -191,6 +215,7 @@ const Grid = () => {
                         </div>                  
                     </div>
                 </div>
+            </div>
             </div>
         </>
     )
