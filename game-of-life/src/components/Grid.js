@@ -103,7 +103,7 @@ const Grid = () => {
     return(
         <>
             <div className='main-cont'>
-                <div className="grid-cont" style={{gridTemplateColumns:`repeat(${numRows}, .8vw)`}}>
+                <div className="grid-cont">
                     {gridRef.current.map((rows, i) => (
                         rows.map((col, k) => (
                             <div 
@@ -123,7 +123,7 @@ const Grid = () => {
                 </div>
                
 
-            <div>
+            <div className="info-cont">
 
                 <div className="title">
                     <h3>John Conway's</h3>
@@ -198,10 +198,10 @@ const Grid = () => {
                             <input 
                                 id="time-slider" 
                                 type="range" 
-                                min="100" max="1000" 
+                                min="50" max="1000" 
                                 value={timeSlider.time} 
                                 onChange={handleTimeChange}
-                                step="100"
+                                step="50"
                             />
                             
                             <input 
