@@ -162,7 +162,7 @@ body {
 .grid-cont {
   display: grid;
   grid-template-columns: repeat(50, 0.8vw);
-  background-color: rgb(0, 108, 105);
+  background-color: rgb(9, 116, 98);
   margin: 2vh 0 0 0;
   width: 40vw;
   gap: 0;

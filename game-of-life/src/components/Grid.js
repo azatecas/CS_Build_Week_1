@@ -244,6 +244,15 @@ const Grid = () => {
                   live cell, as if by reproduction.
                 </li>
               </ol>
+              <p>
+                More info on{" "}
+                <a
+                  href="https://en.wikipedia.org/wiki/Conway%27s_Game_of_Life"
+                  target="a_blank"
+                >
+                  The Game of Life
+                </a>{" "}
+              </p>
             </div>
           </div>
         </div>
